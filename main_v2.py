@@ -430,7 +430,8 @@ async def installUpdate(username: str, password: str, current_user: User = Depen
                 with open("version.txt", "w") as f:
                     f.write(version)
                 link_download = final["link"]
-                os.system("wget {} -P ./ONNX_model/".format(link_download))
+                os.system(
+                    "wget {} -O ./ONNX_model/ONNX_model.zip".format(link_download))
                 os.system("reboot")
         else:
             final = {"result": "Fail", "message": "request timeout"}
