@@ -9,7 +9,7 @@ ExecStart=/home/techpro/nddung105/Code_api/service_reboot/setup.sh
 ExecStop=/bin/echo stop API
 KillMode=mixed
 TimeoutStopSec=30
-User=root
+User=techpro
 LimitNOFILE=100000
 
 [Install]
