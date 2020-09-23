@@ -43,12 +43,11 @@ for line in Lines:
 f.close()
 
 version = ""
-f = open("version.txt", "r")
-Lines = f.readlines()
+with open("version.txt", "r") as f:
+    Lines = f.readlines()
 for line in Lines:
     if line != "\n":
         version = line.replace("\n", "")
-
 
 eventlet.monkey_patch()
 
@@ -396,7 +395,8 @@ def deleteCamera(CameraID: str, password: str, current_user: User = Depends(get_
 
 
 @app.post("/checkUpdate")
-async def checkUpdate(username: str, password: str, current_user: User = Depends(get_current_active_user), version: str = version):
+# async def checkUpdate(username: str, password: str, current_user: User = Depends(get_current_active_user), version: str = version):
+async def checkUpdate(username: str, password: str, current_user: User = Depends(get_current_active_user)):
     if current_user.username != username or not verify_password(password, current_user.hashed_password):
         return {"result": "Fail", "message": "user name or password wrong"}, 200
     else:
@@ -406,14 +406,16 @@ async def checkUpdate(username: str, password: str, current_user: User = Depends
                               username+"&password="+password+"&version="+version)
         if x != None:
             final = x.json()
-            final["result"] = "Success"
+            if not final.get("result"):
+                final["result"] = "Success"
         else:
             final = {"result": "Fail", "message": "request timeout"}
         return final, 200
 
 
 @app.post("/installUpdate")
-async def installUpdate(username: str, password: str, current_user: User = Depends(get_current_active_user), version: str = version):
+# async def installUpdate(username: str, password: str, current_user: User = Depends(get_current_active_user), version: str = version):
+async def installUpdate(username: str, password: str, current_user: User = Depends(get_current_active_user)):
     if current_user.username != username or not verify_password(password, current_user.hashed_password):
         return {"result": "Fail", "message": "user name or password wrong"}, 200
     else:
@@ -423,5 +425,13 @@ async def installUpdate(username: str, password: str, current_user: User = Depen
                               username+"&password="+password+"&version="+version)
         if x != None:
             final = x.json()
-
-        return final, 200
+            if not final.get("result"):
+                version = final["version"]
+                with open("version.txt", "w") as f:
+                    f.write(version)
+                link_download = final["link"]
+                os.system("wget {} -P ./ONNX_model/".format(link_download))
+                os.system("reboot")
+        else:
+            final = {"result": "Fail", "message": "request timeout"}
+    return final, 200
