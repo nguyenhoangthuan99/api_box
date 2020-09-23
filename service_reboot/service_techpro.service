@@ -1,0 +1,16 @@
+[Unit]
+Description=Run API
+Requires=network.target
+After=systemd-user-sessions.service
+
+[Service]
+Type=simple
+ExecStart=/home/techpro/nddung105/Code_api/service_reboot/setup.sh
+ExecStop=/bin/echo stop API
+KillMode=mixed
+TimeoutStopSec=30
+User=root
+LimitNOFILE=100000
+
+[Install]
+WantedBy=multi-user.target
