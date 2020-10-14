@@ -1,0 +1,26 @@
+{
+    "version": [
+        {
+            "version": "1.0.1",
+            "date": "12/1/2020",
+            "new_version": "TECHPRO AIBOX",
+            "link_onnx": "http://14.177.239.164:7070/model_onnx.zip",
+            "link_trt": "",
+            "description": "Hello",
+            "size": "123 MB",
+            "md5": "1ebf239f0bb625c2ebdfa0ecbb739e4e"
+        }
+    ],
+    "AIBOX-CLIENT": {
+        "aibox_id_1": {
+            "date_update": "",
+            "status": "",
+            "new_version": ""
+        },
+        "AIBOX_ID_xxx": {
+            "date_update": "2020-10-09",
+            "status": "string",
+            "new_version": "string"
+        }
+    }
+}
