@@ -5,6 +5,7 @@
             "date": "12/1/2020",
             "new_version": "TECHPRO AIBOX",
             "link_onnx": "http://14.177.239.164:7070/model_onnx.zip",
+	    "link_zip": "http://14.177.239.164:7070/model_onnx.zip",
             "link_trt": "",
             "description": "Hello",
             "size": "123 MB",
