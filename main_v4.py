@@ -1,8 +1,9 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-import cam_login_api
-import decode
-import update
+from modules import cam_login_api
+from modules import decode
+from modules import update
+
 app = FastAPI()
 import random
 

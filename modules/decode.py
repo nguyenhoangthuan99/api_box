@@ -9,9 +9,12 @@ from collections import OrderedDict
 from starlette.websockets import WebSocket, WebSocketDisconnect
 from datetime import datetime, timedelta
 from end2end import inference
-from cam_login_api import list_camera, camera_active
+from .cam_login_api import list_camera, camera_active
 from item import Decode2
 router = APIRouter()
+
+def d(x1,y1,x2,y2):
+   return ((x1-x2)**2  +(y1-y2)**2)**0.5
 
 class Notifier:
     def __init__(self):
