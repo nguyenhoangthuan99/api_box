@@ -9,7 +9,7 @@ from collections import OrderedDict
 from starlette.websockets import WebSocket, WebSocketDisconnect
 from datetime import datetime, timedelta
 from end2end import inference
-from cam_login_api import list_camera, camera_active
+from .cam_login_api import list_camera, camera_active
 from item import Decode2
 router = APIRouter()
 
