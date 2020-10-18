@@ -159,3 +159,4 @@ async def installUpdate(body : Update ,current_user: User = Depends(get_current_
                 os.system(
                     '''wget {} -c -O ./ONNX_model_check/ONNX_model.zip'''.format(link_zip))
                 os.system("echo 1|sudo -S reboot")
+

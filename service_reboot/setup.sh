@@ -31,6 +31,7 @@ then
 			mv $HOME/Code_api_edit/Code_api/ONNX_model_check/main_v3.py $HOME/Code_api_edit/Code_api/
 			cd $HOME/Code_api_edit/Code_api
 			jq '.update_require=false' config.json > config.json.tmp && cp config.json.tmp config.json
+			jq '.update_success=true' config.json > config.json.tmp && cp config.json.tmp config.json
 			sleep 30
 			uvicorn main_v4:app --port 8001 --host 0.0.0.0
 		else
