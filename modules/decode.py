@@ -232,7 +232,7 @@ async def decodes2(body:Decode2):
 
         fileb = base64.b64decode(body.image)
         img = np.array(Image.open(io.BytesIO(fileb)).convert("RGB"))
-        return await process(img,body.CameraID)
+        return await process(img, body.CameraID, final)
 
 
 @router.post("/decode")
@@ -243,7 +243,7 @@ async def decodes(CameraID: str , fileb: bytes = File(...),):
        #     os.mkdir("logs_txt/"+time.strftime("%d-%m-%Y"))
         
         img = np.array(Image.open(io.BytesIO(fileb)).convert("RGB"))
-        return await process(img,CameraID,final)
+        return await process(img, CameraID, final)
 
 
 @router.websocket("/plate-recognition")
