@@ -13,10 +13,11 @@ list_camera = config["cameras"]
 
 camera_active = {}
 
-for key in list_camera.keys():
-    if list_camera[key]["status"] == "1":
-        print("CAPTURING ",list_camera[key]["rstp_link"])
-        gst_str = ('rtspsrc location={} latency=0 ! queue max-size-buffers=1 ! rtph264depay ! h264parse ! omxh264dec ! videoconvert ! appsink max-buffers=1 drop=True').format(list_camera[key]["rstp_link"])
+cameras_ = [list_camera[i]["name"] for i in range(len(list_camera))]
+for key in cameras_:
+    if list_camera[cameras_.index(key)]["status"] == "1":
+        print("CAPTURING ",list_camera[cameras_.index(key)]["rstp_link"])
+        gst_str = ('rtspsrc location={} latency=0 ! queue max-size-buffers=1 ! rtph264depay ! h264parse ! omxh264dec ! videoconvert ! appsink max-buffers=1 drop=True').format(list_camera[cameras_.index(key)]["rstp_link"])
         camera_active[key] = cv2.VideoCapture(gst_str)
 fp = open('config.json', 'r')
 version = json.load(fp)["version"]
@@ -174,14 +175,14 @@ async def addCamera(body:AddCamera ,current_user: User = Depends(get_current_act
 
     #if not await verify_password(body.password, current_user.hashed_password):
     #    return {"result":"Fail","message":"Password wrong! Please enter right password to add camera"},200
-
-    if body.CameraID in list_camera.keys():
+    cameras_ = [list_camera[i]["name"] for i in range(len(list_camera))]
+    if body.CameraID in cameras_:
         return {"result":"Fail","message":body.CameraID +" already exist in database"},200
     else:
-        list_camera[body.CameraID]={"status":body.status,"rstp_link":body.rstp_link}
+        list_camera.append({"name": body.CameraID,"status":body.status,"rstp_link":body.rstp_link})
         ##### create cv2 capture if status is 1:
         if body.status == "1":
-            gst_str = ('rtspsrc location={} latency=0 ! queue max-size-buffers=1 ! rtph264depay ! h264parse ! omxh264dec ! videoconvert ! appsink max-buffers=1 drop=True').format(list_camera[body.CameraID]["rstp_link"])
+            gst_str = ('rtspsrc location={} latency=0 ! queue max-size-buffers=1 ! rtph264depay ! h264parse ! omxh264dec ! videoconvert ! appsink max-buffers=1 drop=True').format(list_camera[len(list_camera)-1]["rstp_link"])
             camera_active[body.CameraID] = cv2.VideoCapture(gst_str)
            # camera_active[body.CameraID] = cv2.VideoCapture(body.rstp_link)
         config["cameras"] = list_camera
@@ -196,16 +197,17 @@ async def editCamera(body:AddCamera ,current_user: User = Depends(get_current_ac
    # if not await verify_password(body.password, current_user.hashed_password):
     #    return {"result":"Fail","message":"Password wrong! Please enter right password to add camera"},200
 
-    if body.CameraID not in list_camera.keys():
+    cameras_ = [list_camera[i]["name"] for i in range(len(list_camera))]
+    if body.CameraID not in cameras_:
         return {"result":"Fail","message":body.CameraID +" does not exist in database"},200
     else:
-        for key in list_camera.keys():
-            if body.rstp_link == list_camera[key]["rstp_link"] and body.CameraID != key:
+        for key in range(len(list_camera)):
+            if body.rstp_link == list_camera[key]["rstp_link"]:
                 return {"result":"Fail","message":"your rstp link already assigned to "+key},200
-        list_camera[body.CameraID]={"status":body.status,"rstp_link":body.rstp_link}
+        list_camera[cameras_.index(body.CameraID)]={"name": body.CameraID,"status":body.status,"rstp_link":body.rstp_link}
         ##### connect Camera if activate
         if body.status == "1":
-            gst_str = ('rtspsrc location={} latency=0 ! queue max-size-buffers=1 ! rtph264depay ! h264parse ! omxh264dec ! videoconvert ! appsink max-buffers=1 drop=True').format(list_camera[body.CameraID]["rstp_link"])
+            gst_str = ('rtspsrc location={} latency=0 ! queue max-size-buffers=1 ! rtph264depay ! h264parse ! omxh264dec ! videoconvert ! appsink max-buffers=1 drop=True').format(list_camera[cameras_.index(body.CameraID)]["rstp_link"])
             camera_active[body.CameraID] = cv2.VideoCapture(gst_str)
             #camera_active[body.CameraID] = cv2.VideoCapture(body.rstp_link)
         elif body.status == "0":
@@ -217,10 +219,11 @@ async def editCamera(body:AddCamera ,current_user: User = Depends(get_current_ac
 
 @router.post("/testCamera")
 async def testCamera(body:TestCamera ,current_user: User = Depends(get_current_active_user)):
-    if body.CameraID not in list_camera.keys():
+    cameras_ = [list_camera[i]["name"] for i in range(len(list_camera))]
+    if body.CameraID not in cameras_:
         return {"result":"Fail","message":body.CameraID +" does not exist in database"},200
     else:
-        vid = cv2.VideoCapture(list_camera[body.CameraID]["rstp_link"]) 
+        vid = cv2.VideoCapture(list_camera[cameras_.index(body.CameraID)]["rstp_link"]) 
         time.sleep(1)
         for i in range(5):
             ret, frame = vid.read() 
@@ -236,13 +239,14 @@ async def deleteCamera(body: DeleteCamera ,current_user: User = Depends(get_curr
    # if not await verify_password(body.password, current_user.hashed_password):
    #     return {"result":"Fail","message":"Password wrong! Please enter right password to add camera"},200
     ### delete cv2 capture if cameraID in active
-    if body.CameraID in camera_active.keys():
+    cameras_ = [list_camera[i]["name"] for i in range(len(list_camera))]
+    
+    if body.CameraID in camera_active:
         camera_active = removekey(camera_active, body.CameraID)
-
-    if body.CameraID not in list_camera.keys():
+    if body.CameraID not in cameras_:
         return {"result":"Fail","message":body.CameraID +" does not exist in database"},200
     else:
-        list_camera= removekey(list_camera, body.CameraID)
+        del list_camera[cameras_.index(body.CameraID)]
         config["cameras"] = list_camera
         with open('config.json', 'w') as fp:
             json.dump(config, fp)
