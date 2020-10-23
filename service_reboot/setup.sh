@@ -14,7 +14,8 @@ md5=$(cat config.json | jq '.md5')
 if [ $update_require == true ]
 then
 	md5_check=$(md5sum $HOME/Code_api_edit/api_box/ONNX_model_check/ONNX_model.zip|cut -f 1 -d " ")
-	if [ $md5 == $md5_check]
+	md5_check='"'$md5_check'"'
+	if [ $md5 == $md5_check ]
 	then
 		unzip -j $HOME/Code_api_edit/api_box/ONNX_model_check/*zip -d $HOME/Code_api_edit/api_box/ONNX_model_check/
 		cd $HOME/Code_api_edit/api_box/ONNX_model_check
@@ -28,7 +29,7 @@ then
 			mv $HOME/Code_api_edit/api_box/ONNX_model_check/*onnx $HOME/Code_api_edit/api_box/ONNX_model
 			mv $HOME/Code_api_edit/api_box/ONNX_model_check/ocr_.py $HOME/Code_api_edit/api_box/ONNX_model
 			mv $HOME/Code_api_edit/api_box/ONNX_model_check/onnx_to_tensorrt.py $HOME/Code_api_edit/api_box/ONNX_model
-			mv $HOME/Code_api_edit/api_box/ONNX_model_check/main_v3.py $HOME/Code_api_edit/api_box/
+			#mv $HOME/Code_api_edit/api_box/ONNX_model_check/main_v3.py $HOME/Code_api_edit/api_box/
 			cd $HOME/Code_api_edit/api_box
 			jq '.update_require=false' config.json > config.json.tmp && cp config.json.tmp config.json
 			jq '.update_success=true' config.json > config.json.tmp && cp config.json.tmp config.json

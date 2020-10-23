@@ -202,8 +202,8 @@ async def editCamera(body:AddCamera ,current_user: User = Depends(get_current_ac
         return {"result":"Fail","message":body.CameraID +" does not exist in database"},200
     else:
         for key in range(len(list_camera)):
-            if body.rstp_link == list_camera[key]["rstp_link"]:
-                return {"result":"Fail","message":"your rstp link already assigned to "+key},200
+            if (body.rstp_link == list_camera[key]["rstp_link"]) and (body.status == list_camera[key]["status"]):
+                return {"result":"Fail","message":"your data already assigned to "+str(key)},200
         list_camera[cameras_.index(body.CameraID)]={"name": body.CameraID,"status":body.status,"rstp_link":body.rstp_link}
         ##### connect Camera if activate
         if body.status == "1":
