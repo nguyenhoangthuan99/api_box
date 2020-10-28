@@ -37,7 +37,10 @@ async def startup_event():
     update_success = data["update_success"] 
     fp.close()
     if update_success:
+      try:
         requests.post(url="http://14.177.239.164:9090/updateVersion",json={"AIBOX_ID":"aibox_id_1","status":"","new_version":version})
+      except:
+        pass 
     data["update_success"] = False
     with open("config.json","w") as fp:
         json.dump(data,fp)  

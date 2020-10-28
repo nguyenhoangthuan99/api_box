@@ -157,7 +157,8 @@ async def stream_decodes_gstreamer(CameraID: str ):
         global capture
         final ={}
         final["received_time"] = time.strftime("%d-%m-%Y %H:%M:%S")
-        if CameraID not in camera_active.keys() and list_camera[CameraID]["status"] == "1":
+        cameras_ = [list_camera[i]["name"] for i in range(len(list_camera))]
+        if CameraID not in camera_active.keys() and list_camera[cameras_.index(CameraID)]["status"] == "1":
             return {"error": "CameraID is not active"} ,0      
         
        # camera_active[CameraID].set(cv2.CAP_PROP_BUFFERSIZE, 1);
@@ -178,7 +179,7 @@ async def stream_decodes_gstreamer(CameraID: str ):
 
         # if can not read again ==> re-connect to camera
         if not ret:
-            gst_str = ('rtspsrc location={} latency=0 ! queue max-size-buffers=1 ! rtph264depay ! h264parse ! omxh264dec ! videoconvert ! appsink max-buffers=1 drop=True').format(list_camera[CameraID]["rstp_link"])
+            gst_str = ('rtspsrc location={} latency=0 ! queue max-size-buffers=1 ! rtph264depay ! h264parse ! omxh264dec ! videoconvert ! appsink max-buffers=1 drop=True').format(list_camera[cameras_.index(CameraID)]["rstp_link"])
             camera_active[CameraID] = cv2.VideoCapture(gst_str)
             
             
@@ -213,8 +214,9 @@ async def stream_decodes(CameraID: str ):
                 break
 
         # if can not read again ==> re-connect to camera
+        cameras_ = [list_camera[i]["name"] for i in range(len(list_camera))]
         if not ret:
-            camera_active[CameraID] = cv2.VideoCapture(list_camera[CameraID]["rstp_link"])
+            camera_active[CameraID] = cv2.VideoCapture(list_camera[cameras_.index(CameraID)]["rstp_link"])
             # camera_active[CameraID].set(cv2.CAP_PROP_BUFFERSIZE, 1);
             camera_active[CameraID].set(cv2.CAP_PROP_POS_FRAMES, -2)
             print("------------- RECONNNECT TO CAMERA ---------------")
