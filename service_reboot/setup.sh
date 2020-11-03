@@ -1,5 +1,6 @@
 #!/bin/bash
 
+# Config path and library
 export PATH=/home/xuanhung/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/usr/local/cuda/bin
 export LD_LIBRARY_PATH=:/usr/local/cuda/lib64
 export DEVICE="jetson"
@@ -8,52 +9,71 @@ export DEVICE="jetson"
 
 cd $HOME/Code_api_edit/api_box/
 
+# Get update_require and md5 from config.json file
 update_require=$(cat config.json | jq --raw-output '.update_require')
 md5=$(cat config.json | jq '.md5')
 
-if [ $update_require == true ]
-then
-	md5_check=$(md5sum $HOME/Code_api_edit/api_box/ONNX_model_check/ONNX_model.zip|cut -f 1 -d " ")
+# If require update
+if [ $update_require == true ]; then
+
+	# Check md5
+	md5_check=$(md5sum $HOME/Code_api_edit/api_box/ONNX_model_check/ONNX_model.zip | cut -f 1 -d " ")
 	md5_check='"'$md5_check'"'
-	if [ $md5 == $md5_check ]
-	then
+	if [ $md5 == $md5_check ]; then
+
 		unzip -j $HOME/Code_api_edit/api_box/ONNX_model_check/*zip -d $HOME/Code_api_edit/api_box/ONNX_model_check/
 		cd $HOME/Code_api_edit/api_box/ONNX_model_check
-		python3 ocr_.py
-		python3 onnx_to_tensorrt.py
-		number_trt=$(find *trt | wc -l)
-		if [ $number_trt == 2 ]
-		then
-			mv $HOME/Code_api_edit/api_box/ONNX_model_check/*trt $HOME/Code_api_edit/api_box/TRT_model
-			rm $HOME/Code_api_edit/api_box/ONNX_model_check/*zip
-			mv $HOME/Code_api_edit/api_box/ONNX_model_check/*onnx $HOME/Code_api_edit/api_box/ONNX_model
-			mv $HOME/Code_api_edit/api_box/ONNX_model_check/ocr_.py $HOME/Code_api_edit/api_box/ONNX_model
-			mv $HOME/Code_api_edit/api_box/ONNX_model_check/onnx_to_tensorrt.py $HOME/Code_api_edit/api_box/ONNX_model
-			#mv $HOME/Code_api_edit/api_box/ONNX_model_check/main_v3.py $HOME/Code_api_edit/api_box/
-			cd $HOME/Code_api_edit/api_box
-			jq '.update_require=false' config.json > config.json.tmp && cp config.json.tmp config.json
-			jq '.update_success=true' config.json > config.json.tmp && cp config.json.tmp config.json
-			sleep 30
-			uvicorn main_v4:app --port 8001 --host 0.0.0.0
+
+		# Have .sh fileß
+		if [ -f $HOME/Code_api_edit/api_box/ONNX_model_check/service_reboot/setup.sh ]; then
+			chmod +x $HOME/Code_api_edit/api_box/ONNX_model_check/service_reboot/setup.sh
+			$HOME/Code_api_edit/api_box/ONNX_model_check/service_reboot/setup.sh
+
 		else
-			rm -r $HOME/Code_api_edit/api_box/ONNX_model_check/*
-			cd $HOME/Code_api_edit/api_box
-			jq '.update_require=false' config.json > config.json.tmp && cp config.json.tmp config.json
-			sleep 30
-			uvicorn main_v4:app --port 8001 --host 0.0.0.0
+			# Have file ONNX
+			if ls $HOME/Code_api_edit/api_box/ONNX_model_check/*.onnx &>/dev/null; then
+				python3 ocr_.py
+				python3 onnx_to_tensorrt.py
+				number_trt=$(find *trt | wc -l)
+
+				# If convert success, have 2 file trt
+				if [ $number_trt == 2 ]; then
+					mv $HOME/Code_api_edit/api_box/ONNX_model_check/*trt $HOME/Code_api_edit/api_box/TRT_model
+					rm $HOME/Code_api_edit/api_box/ONNX_model_check/*zip
+					mv $HOME/Code_api_edit/api_box/ONNX_model_check/* $HOME/Code_api_edit/api_box/
+					cd $HOME/Code_api_edit/api_box
+					jq '.update_require=false' config.json >config.json.tmp && cp config.json.tmp config.json
+					jq '.update_success=true' config.json >config.json.tmp && cp config.json.tmp config.json
+					sleep 30
+					uvicorn main_v4:app --port 8001 --host 0.0.0.0
+				fi
+
+			# Else not have file ONNX
+			else
+				rm $HOME/Code_api_edit/api_box/ONNX_model_check/*zip
+				mv $HOME/Code_api_edit/api_box/ONNX_model_check/* $HOME/Code_api_edit/api_box/
+				cd $HOME/Code_api_edit/api_box
+				jq '.update_require=false' config.json >config.json.tmp && cp config.json.tmp config.json
+				jq '.update_success=true' config.json >config.json.tmp && cp config.json.tmp config.json
+				sleep 30
+				uvicorn main_v4:app --port 8001 --host 0.0.0.0
+			fi
 		fi
+
+	# Else md5
 	else
 		rm -r $HOME/Code_api_edit/api_box/ONNX_model_check/*
 		cd $HOME/Code_api_edit/api_box
-		jq '.update_require=false' config.json > config.json.tmp && cp config.json.tmp config.json
+		jq '.update_require=false' config.json >config.json.tmp && cp config.json.tmp config.json
 		sleep 30
 		uvicorn main_v4:app --port 8001 --host 0.0.0.0
 	fi
+
+# Else not update
 else
 	# rm -r $HOME/Code_api_edit/api_box/ONNX_model_check/*
 	cd $HOME/Code_api_edit/api_box
-	jq '.update_require=false' config.json > config.json.tmp && cp config.json.tmp config.json
+	jq '.update_require=false' config.json >config.json.tmp && cp config.json.tmp config.json
 	sleep 30
 	uvicorn main_v4:app --port 8001 --host 0.0.0.0
 fi
-#uvicorn server_api:app --host 0.0.0.0 --port 9090
