@@ -2,3 +2,4 @@ ONNX_model/*onnx
 TRT_model/*trt
 TRT_model_jetson/*trt
 ONNX_model_jetson/*onnx
+.vscode/
