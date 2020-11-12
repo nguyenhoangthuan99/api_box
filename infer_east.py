@@ -183,7 +183,7 @@ class EAST:
         return result,bbox,img
 
 import time
-east = EAST("./TRT_model/east_288_352_fp16.trt","./TRT_model/east_python_704_1280_fp16.trt")
+east = EAST("./TRT_model/east_288_352_fp16.trt","./TRT_model/east_704_1280_fp16.trt")
 """
 import cv2  #/tf_model_96_0.1.pb
 img = cv2.imread("test_/00000000219000000_1227.jpg")[:,:,::-1]
