@@ -11,8 +11,8 @@ from multiprocessing import Pool
 import threading
 import numpy as np
 import scipy.optimize
-import matplotlib.pyplot as plt
-import matplotlib.patches as Patches
+#import matplotlib.pyplot as plt
+#import matplotlib.patches as Patches
 from shapely.geometry import Polygon
 
 #import tensorflow as tf
