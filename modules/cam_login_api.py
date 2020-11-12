@@ -18,7 +18,7 @@ for key in cameras_:
     if list_camera[cameras_.index(key)]["status"] == "1":
         print("CAPTURING ",list_camera[cameras_.index(key)]["rstp_link"])
         gst_str = ('rtspsrc location={} latency=0 ! queue max-size-buffers=1 ! rtph264depay ! h264parse ! omxh264dec ! videoconvert ! appsink max-buffers=1 drop=True').format(list_camera[cameras_.index(key)]["rstp_link"])
-        camera_active[key] = cv2.VideoCapture(gst_str)
+        camera_active[key] = cv2.VideoCapture(gst_str, cv2.CAP_GSTREAMER)
 fp = open('config.json', 'r')
 version = json.load(fp)["version"]
 fp.close()
@@ -183,7 +183,7 @@ async def addCamera(body:AddCamera ,current_user: User = Depends(get_current_act
         ##### create cv2 capture if status is 1:
         if body.status == "1":
             gst_str = ('rtspsrc location={} latency=0 ! queue max-size-buffers=1 ! rtph264depay ! h264parse ! omxh264dec ! videoconvert ! appsink max-buffers=1 drop=True').format(list_camera[len(list_camera)-1]["rstp_link"])
-            camera_active[body.CameraID] = cv2.VideoCapture(gst_str)
+            camera_active[body.CameraID] = cv2.VideoCapture(gst_str, cv2.CAP_GSTREAMER)
            # camera_active[body.CameraID] = cv2.VideoCapture(body.rstp_link)
         config["cameras"] = list_camera
         with open('config.json', 'w') as fp:
@@ -208,7 +208,7 @@ async def editCamera(body:AddCamera ,current_user: User = Depends(get_current_ac
         ##### connect Camera if activate
         if body.status == "1":
             gst_str = ('rtspsrc location={} latency=0 ! queue max-size-buffers=1 ! rtph264depay ! h264parse ! omxh264dec ! videoconvert ! appsink max-buffers=1 drop=True').format(list_camera[cameras_.index(body.CameraID)]["rstp_link"])
-            camera_active[body.CameraID] = cv2.VideoCapture(gst_str)
+            camera_active[body.CameraID] = cv2.VideoCapture(gst_str, cv2.CAP_GSTREAMER)
             #camera_active[body.CameraID] = cv2.VideoCapture(body.rstp_link)
         elif body.status == "0":
             camera_active[body.CameraID] = None
