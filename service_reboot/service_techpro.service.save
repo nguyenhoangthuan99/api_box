@@ -1,15 +1,15 @@
-[Unit]
+\[Unit]
 Description=Run API
 Requires=network.target
 After=systemd-user-sessions.service
 
 [Service]
 Type=simple
-ExecStart=/home/mic-710iva/api_box/service_reboot/setup.sh
+ExecStart=/home/techpro/nddung105/Code_api/service_reboot/setup.sh
 ExecStop=/bin/echo stop API
 KillMode=mixed
 TimeoutStopSec=30
-User=mic-710iva
+User=techpro
 LimitNOFILE=100000
 
 [Install]
