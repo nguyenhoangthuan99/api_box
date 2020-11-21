@@ -18,16 +18,17 @@ sudo python3 -m pip install pycuda
 sudo python3 -m pip install Pillow
 sudo pip3 install fastapi uvicorn python-jose[cryptography] python-multipart shapely eventlet passlib[bcrypt]
 
-wget http://14.177.239.164:7070/model_onnx.zip
-unzip model_onnx.zip
-cd model_onnx/ONNX_model
-python3 ocr_.py
-python3 onnx_to_tensorrt.py
-mkdir ~/api_box/TRT_model
-mv *.trt ~/api_box/TRT_model
+# wget http://14.177.239.164:7070/model_onnx.zip
+# unzip model_onnx.zip
+# cd model_onnx/ONNX_model
+# python3 ocr_.py
+# python3 onnx_to_tensorrt.py
+# mkdir ~/api_box/TRT_model
+# mv *.trt ~/api_box/TRT_model
 
 export DEVICE="jetson"
 echo 'export DEVICE="jetson"' >> ~/.bashrc 
+
 uvicorn main_v4:app --host 0.0.0.0 --port 8000
 
 gst-launch-1.0 rtspsrc location=rtsp://admin:Camera1234@171.244.236.152:554 latency=0 ! queue max-size-buffers=1 ! rtph264depay ! h264parse ! omxh264dec ! videoconvert ! appsink max-buffers=1 drop=True 
